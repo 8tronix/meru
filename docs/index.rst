@@ -13,6 +13,7 @@ Welcome to meru's documentation!
    overview
    project_structure
    api
+   class-api
 
 Indices and tables
 ==================
