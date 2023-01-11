@@ -58,7 +58,9 @@ async def handle_action(action):
     action_cls = action.__class__
     handler = HANDLERS.get(action_cls, None)
 
-    await update_state(action)
+    # the return value is ignored in non-broker processes
+    async for _ in update_state(action):
+        pass
 
     if not handler:
         return

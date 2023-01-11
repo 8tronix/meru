@@ -5,6 +5,7 @@ This module maintains a global list of :py:class:`StateNode` objects.
 from collections import defaultdict
 from dataclasses import fields
 import logging
+import inspect
 from typing import Type
 
 from meru.actions import RequireState, StateUpdate
@@ -98,12 +99,22 @@ def get_all_states():
 async def update_state(action: Action):
     """Calls the state update handlers that are triggered by an :py:class:`Action` oject.
 
+    All processes except the broker should ignore the return value.
+
     Parameters:
         action: The action.
+    Returns:
+        Actions emitted by the state action handlers.
     """
     if action.__class__ in STATE_ACTION_HANDLERS:
         for method in STATE_ACTION_HANDLERS[action.__class__]:
-            method(action)
+            if inspect.isasyncgenfunction(method):
+                for action in method(action):
+                    yield action
+            else:
+                return_value = method(action)
+                if return_value is not None:
+                    yield return_value
 
 
 def get_state(state_cls: StateModelType) -> StateModelType:
