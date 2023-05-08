@@ -45,7 +45,7 @@ def inspect_action_handler_args(func: callable):
     Returns:
     """
     found_action = None
-    required_states = set()
+    required_states = []
     signature = inspect.signature(func)
 
     for param in signature.parameters.values():
@@ -59,7 +59,7 @@ def inspect_action_handler_args(func: callable):
                     f"Type '{param.annotation.__name__}' has been added twice to handler '{func.__name__}'. "
                     f"This is not possible."
                 )
-            required_states.add(param.annotation)
+            required_states.append(param.annotation)
         else:
             raise HandlerException(
                 f"Error registering {func.__name__}. "
